@@ -9,10 +9,16 @@ Objetivo:
 IMPORTANTE:
 - Las actividades LESSON pueden modificar el conocimiento latente del estudiante
   en el simulador, pero NO se escriben como interacciones DKT.
-- Solo se exportan:
+- Se exportan:
+    PRE_TEST
     QUIZ
     REINFORCEMENT
     FINAL
+
+- PRE_TEST alimenta DKT como evidencia diagnóstica inicial, pero:
+    * no produce aprendizaje latente;
+    * no marca una skill como trabajada en el curso;
+    * no habilita LOW_MASTERY antes de que la skill se trabaje en QUIZ/FINAL/REINFORCEMENT.
 
 Contrato mínimo del modelo:
     user_id, skill_id, correct, timestamp
@@ -89,12 +95,9 @@ PARAMS = {
     "quiz_refuerzo_objetivo": 2,
 
     # FINAL dinámico EDUFIN:
-    # 10 preguntas base + 3 a 5 adicionales.
-    # Las adicionales priorizan LOW_MASTERY y,
-    # si faltan, se completan con STANDARD.
-    "final_base": 10,
-    "final_extra_min": 3,
-    "final_extra_max": 5,
+    # 3 preguntas STANDARD por cada LESSON/skill del módulo
+    # + refuerzo LOW_MASTERY proporcional, sin relleno STANDARD adicional.
+    "final_base_por_lesson": 3,
 }
 
 
@@ -103,7 +106,13 @@ def sigmoid(x: float) -> float:
 
 
 class Banco:
-    def __init__(self, ruta_json: str | Path, rng: random.Random, params: Mapping[str, object]):
+    def __init__(
+        self,
+        ruta_json: str | Path,
+        rng: random.Random,
+        params: Mapping[str, object],
+        ruta_pretest: str | Path | None = None,
+    ):
         data = json.load(open(ruta_json, encoding="utf-8"))
 
         self.items = {row["id"]: row for row in data}
@@ -139,6 +148,33 @@ class Banco:
             self.skills_por_modulo[self.modulo[skill]].append(skill)
 
         self.modulos = sorted(self.skills_por_modulo)
+
+        self.pretest_items: List[str] = []
+
+        if ruta_pretest is not None:
+            pretest_data = json.load(open(ruta_pretest, encoding="utf-8"))
+
+            for row in sorted(pretest_data, key=lambda x: int(x["order"])):
+                code = str(row["code"])
+                skill = int(row["dkt_skill_id"])
+
+                if skill < 1 or skill > 30:
+                    raise ValueError(f"Skill PRE_TEST inválida en {code}: {skill}")
+
+                # Adaptamos la pregunta experimental al mismo contrato interno
+                # que usa responder(). No se mezcla con los bancos QUIZ/LESSON.
+                self.items[code] = {
+                    "id": code,
+                    "competencia_dkt": skill,
+                    "modulo_orden": int(row["module_number"]),
+                    "concepto_id": f"PRETEST_SKILL_{skill}",
+                    "tipo_leccion": "PRE_TEST",
+                    "tipo_pregunta": "MULTIPLE_CHOICE",
+                    "dificultad": int(row.get("difficulty", 2)),
+                    "texto": row.get("text", ""),
+                    "source": row.get("source", ""),
+                }
+                self.pretest_items.append(code)
 
         b_por_dificultad = params["b_por_dificultad"]
         ruido_item_de = float(params["ruido_item_de"])
@@ -204,7 +240,9 @@ class Estudiante:
 
         self.aciertos: Dict[int, List[int]] = defaultdict(lambda: [0, 0])
         self.ultima_practica: Dict[int, float] = {}
-        self.skills_observadas: set[int] = set()
+        # Skills que ya fueron trabajadas realmente en el curso.
+        # PRE_TEST NO entra aquí; solo QUIZ / REINFORCEMENT / FINAL.
+        self.skills_trabajadas_curso: set[int] = set()
 
     # ------------------------------------------------------------------
     # Conocimiento latente
@@ -299,6 +337,9 @@ class Estudiante:
         interaction_type: str,
         selection_reason: str,
         activity_module_id: Optional[int] = None,
+        *,
+        aplicar_aprendizaje: bool = True,
+        marcar_trabajada_en_curso: bool = True,
     ) -> None:
         item = self.B.items[item_id]
         skill = int(item["competencia_dkt"])
@@ -350,17 +391,21 @@ class Estudiante:
             "latent_theta": round(theta, 6),
         })
 
-        if correcto:
-            ganancia = float(self.P["ganancia_acierto"])
-        else:
-            ganancia = float(self.P["ganancia_error_con_feedback"])
+        if aplicar_aprendizaje:
+            if correcto:
+                ganancia = float(self.P["ganancia_acierto"])
+            else:
+                ganancia = float(self.P["ganancia_error_con_feedback"])
 
-        self._aprender(skill, ganancia)
+            self._aprender(skill, ganancia)
 
         self.aciertos[skill][0] += correcto
         self.aciertos[skill][1] += 1
         self.ultima_practica[skill] = self.t
-        self.skills_observadas.add(skill)
+
+        if marcar_trabajada_en_curso:
+            self.skills_trabajadas_curso.add(skill)
+
         self.vistos.add(item_id)
 
         self._avanzar_pregunta()
@@ -444,13 +489,33 @@ class Estudiante:
     # Ruta EDUFIN
     # ------------------------------------------------------------------
 
+    def ejecutar_pre_test(self) -> None:
+        """
+        Ejecuta las 12 preguntas diagnósticas reales del PRE_TEST antes
+        del módulo 1. Estas respuestas alimentan DKT, pero no representan
+        enseñanza y no habilitan refuerzo LOW_MASTERY por sí solas.
+        """
+        for item_id in self.B.pretest_items:
+            item = self.B.items[item_id]
+            self.responder(
+                item_id,
+                "PRE_TEST",
+                "STANDARD",
+                activity_module_id=int(item["modulo_orden"]),
+                aplicar_aprendizaje=False,
+                marcar_trabajada_en_curso=False,
+            )
+
+        # Separación temporal pequeña antes de iniciar el curso.
+        self._nueva_sesion()
+
     def ejecutar_quiz_skill(self, skill: int) -> None:
         total = int(self.P["quiz_total"])
         objetivo_refuerzo = int(self.P["quiz_refuerzo_objetivo"])
 
         previas = sorted(
             s
-            for s in self.skills_observadas
+            for s in self.skills_trabajadas_curso
             if s != skill
         )
 
@@ -504,64 +569,48 @@ class Estudiante:
         """
         Replica la política actual del backend:
 
-        - 10 preguntas BASE equilibradas entre skills del módulo.
-        - 3 a 5 preguntas adicionales.
-        - Las adicionales priorizan LOW_MASTERY.
-        - Si faltan adaptativas, se completa con STANDARD.
-        - Todas usan interaction_type = FINAL.
+        - 3 preguntas STANDARD por cada LESSON/skill del módulo.
+        - Refuerzo LOW_MASTERY proporcional:
+            3-4 LESSON -> hasta 3
+            5 LESSON   -> hasta 4
+            6+ LESSON  -> hasta 5
+        - No se rellena con STANDARD cuando faltan refuerzos.
+        - Todas las preguntas usan interaction_type = FINAL.
         """
-        base_total = int(self.P["final_base"])
-        extra_min = int(self.P["final_extra_min"])
-        extra_max = int(self.P["final_extra_max"])
-
+        base_por_lesson = int(self.P["final_base_por_lesson"])
         skills_modulo = list(self.B.skills_por_modulo[modulo])
 
         if not skills_modulo:
             return
 
+        if len(skills_modulo) <= 4:
+            refuerzo_max = 3
+        elif len(skills_modulo) == 5:
+            refuerzo_max = 4
+        else:
+            refuerzo_max = 5
+
         final_items: List[tuple[str, str, str]] = []
         usados: set[str] = set()
 
         # --------------------------------------------------------------
-        # 1. 10 preguntas base equilibradas entre skills del módulo
+        # 1. Exactamente 3 preguntas base por LESSON/skill
         # --------------------------------------------------------------
-        base_per_skill = base_total // len(skills_modulo)
-        remainder = base_total % len(skills_modulo)
-
-        for idx, skill in enumerate(skills_modulo):
-            quota = base_per_skill + (1 if idx < remainder else 0)
-
-            if quota <= 0:
-                continue
-
+        for skill in skills_modulo:
             chosen = self._elegir(
                 self.B.quiz_items.get(skill, []),
-                quota,
+                base_por_lesson,
             )
 
-            for item_id in chosen:
-                if item_id in usados:
-                    continue
+            chosen = [item_id for item_id in chosen if item_id not in usados]
 
-                usados.add(item_id)
+            if len(chosen) < base_por_lesson:
+                raise ValueError(
+                    f"Skill {skill} sin suficientes preguntas distintas "
+                    f"para FINAL: {len(chosen)}/{base_por_lesson}"
+                )
 
-                final_items.append((
-                    item_id,
-                    "FINAL",
-                    "STANDARD",
-                ))
-
-        # Rellenar la base si alguna skill no tenía suficientes preguntas
-        if len(final_items) < base_total:
-            extras_base = self.seleccionar_estandar_modulo(
-                modulo,
-                base_total - len(final_items) + 10,
-            )
-
-            for item_id in extras_base:
-                if item_id in usados:
-                    continue
-
+            for item_id in chosen[:base_por_lesson]:
                 usados.add(item_id)
                 final_items.append((
                     item_id,
@@ -569,83 +618,42 @@ class Estudiante:
                     "STANDARD",
                 ))
 
-                if len(final_items) >= base_total:
-                    break
-
         # --------------------------------------------------------------
-        # 2. Hasta 5 preguntas extra LOW_MASTERY
+        # 2. LOW_MASTERY solo sobre skills trabajadas en el curso
         # --------------------------------------------------------------
-        candidatas = sorted(self.skills_observadas)
+        candidatas = sorted(self.skills_trabajadas_curso)
 
         weak_skills = self.skills_low_mastery(
             candidatas,
-            min(extra_max, len(candidatas)),
+            min(refuerzo_max, len(candidatas)),
         )
 
         adaptive_added = 0
 
         for weak_skill in weak_skills:
-            if adaptive_added >= extra_max:
+            if adaptive_added >= refuerzo_max:
                 break
 
-            # Una pregunta por skill débil; el backend hace la selección
-            # por skill de forma análoga.
+            pool_disponible = [
+                item_id
+                for item_id in self.B.quiz_items.get(weak_skill, [])
+                if item_id not in usados
+            ]
+
             chosen = self._elegir(
-                self.B.quiz_items.get(weak_skill, []),
+                pool_disponible,
                 1,
             )
 
             for item_id in chosen:
-                if item_id in usados:
-                    continue
-
                 usados.add(item_id)
-
                 final_items.append((
                     item_id,
                     "FINAL",
                     "LOW_MASTERY",
                 ))
-
                 adaptive_added += 1
                 break
-
-        # --------------------------------------------------------------
-        # 3. Target final 13..15
-        # --------------------------------------------------------------
-        desired_extra_count = max(
-            extra_min,
-            min(adaptive_added, extra_max),
-        )
-
-        target_total = base_total + desired_extra_count
-
-        # --------------------------------------------------------------
-        # 4. Completar STANDARD si faltan preguntas
-        # --------------------------------------------------------------
-        if len(final_items) < target_total:
-            standard_fill = self.seleccionar_estandar_modulo(
-                modulo,
-                target_total - len(final_items) + 10,
-            )
-
-            for item_id in standard_fill:
-                if item_id in usados:
-                    continue
-
-                usados.add(item_id)
-
-                final_items.append((
-                    item_id,
-                    "FINAL",
-                    "STANDARD",
-                ))
-
-                if len(final_items) >= target_total:
-                    break
-
-        # Seguridad: máximo 15.
-        final_items = final_items[: base_total + extra_max]
 
         self.rng.shuffle(final_items)
 
@@ -658,6 +666,9 @@ class Estudiante:
             )
 
     def recorrer_ruta(self) -> List[dict]:
+        # El flujo real inicia con el diagnóstico PRE_TEST.
+        self.ejecutar_pre_test()
+
         for modulo in self.B.modulos:
 
             for skill in self.B.skills_por_modulo[modulo]:
@@ -665,7 +676,7 @@ class Estudiante:
                 self.ejecutar_quiz_skill(skill)
                 self._nueva_sesion()
 
-            # FINAL dinámico de 10 preguntas al terminar el módulo.
+            # FINAL dinámico: 3 preguntas por LESSON + LOW_MASTERY proporcional.
             self.ejecutar_final_modulo(modulo)
             self._nueva_sesion()
 
@@ -676,6 +687,7 @@ def simular(
     n_estudiantes: int,
     ruta_banco: str | Path,
     *,
+    ruta_pretest: str | Path = "pretest_preguntas.json",
     semilla: int = 42,
     params: Optional[Mapping[str, object]] = None,
     prefijo: str = "sim",
@@ -689,7 +701,7 @@ def simular(
         P.update(params)
 
     rng = random.Random(semilla)
-    banco = Banco(ruta_banco, rng, P)
+    banco = Banco(ruta_banco, rng, P, ruta_pretest=ruta_pretest)
 
     filas: List[dict] = []
 
@@ -772,6 +784,7 @@ def guardar_csv(
 
 def validar_dataset(filas: Sequence[Mapping[str, object]]) -> None:
     permitidos = {
+        "PRE_TEST",
         "QUIZ",
         "REINFORCEMENT",
         "FINAL",
@@ -853,6 +866,11 @@ def main() -> None:
     )
 
     parser.add_argument(
+        "--pretest",
+        default="pretest_preguntas.json",
+    )
+
+    parser.add_argument(
         "--output",
         default="datasets/simulated_v1.csv",
     )
@@ -868,6 +886,7 @@ def main() -> None:
     filas = simular(
         args.students,
         args.bank,
+        ruta_pretest=args.pretest,
         semilla=args.seed,
     )
 

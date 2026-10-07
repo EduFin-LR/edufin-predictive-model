@@ -1,0 +1,207 @@
+[
+  {
+    "code": "PRE_Q01",
+    "order": 1,
+    "module_number": 1,
+    "module_name": "Ingresos y presupuesto",
+    "competency": "Sueldo bruto vs. neto",
+    "text": "Una empresa emite la boleta de pago mensual de Juana correspondiente al mes de julio. El documento detalla: Salario bruto: S/ 2,800; Deducciones de ley (aportes previsionales e impuestos): S/ 300; Salario neto: S/ 2,500; Salario bruto acumulado del año: S/ 19,600. ¿Cuánto dinero deposita efectivamente la empresa en la cuenta bancaria de Juana a fin de mes?",
+    "source": "PISA 2012 - PF067Q01 (Nómina)",
+    "dkt_skill_id": 1,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "S/ 300", "correct": false},
+      {"code": "B", "text": "S/ 2,500", "correct": true},
+      {"code": "C", "text": "S/ 2,800", "correct": false},
+      {"code": "D", "text": "S/ 19,600", "correct": false},
+      {"code": "E", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q02",
+    "order": 2,
+    "module_number": 1,
+    "module_name": "Ingresos y presupuesto",
+    "competency": "Control presupuestal",
+    "text": "¿Para cuál de las siguientes funciones NO puede utilizarse un presupuesto familiar o personal?",
+    "source": "P-Fin 8 - Q2 (Consuming / GFLEC)",
+    "dkt_skill_id": 4,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Para registrar y hacer el seguimiento del patrimonio o activos financieros acumulados (inmuebles, autos, cuentas de inversión)", "correct": true},
+      {"code": "B", "text": "Para planificar y priorizar los gastos necesarios y obligatorios del mes", "correct": false},
+      {"code": "C", "text": "Para planificar los gastos discrecionales o de entretenimiento personal", "correct": false},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q03",
+    "order": 3,
+    "module_number": 2,
+    "module_name": "Ahorro",
+    "competency": "Inflación y poder adquisitivo",
+    "text": "Alicia mantiene S/ 1,000 en una cuenta de ahorros que genera una tasa de rentabilidad del 2% al año. Durante ese mismo año, la tasa de inflación en el país fue del 3%. ¿Cuál de las siguientes afirmaciones es correcta respecto a su dinero al cabo de ese año?",
+    "source": "P-Fin 8 - Q3 / OCDE-INFE - QK3",
+    "dkt_skill_id": 10,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Alicia podrá comprar menos cosas con su dinero que al inicio del año", "correct": true},
+      {"code": "B", "text": "Alicia podrá comprar más cosas con su dinero que al inicio del año", "correct": false},
+      {"code": "C", "text": "Su poder adquisitivo se mantendrá exactamente igual", "correct": false},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q04",
+    "order": 4,
+    "module_number": 2,
+    "module_name": "Ahorro",
+    "competency": "Interés simple en cuentas de depósito",
+    "text": "Una persona deposita S/ 100 en una cuenta de ahorros a plazo fijo libre de comisiones, con una tasa de interés garantizada del 2% anual. Si no realiza ningún depósito adicional ni retira dinero durante ese periodo, ¿cuánto dinero tendrá en la cuenta al finalizar el primer año tras el abono de intereses?",
+    "source": "OCDE-INFE - QK5 (Batería SBS/CAF)",
+    "dkt_skill_id": 8,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "S/ 100", "correct": false},
+      {"code": "B", "text": "S/ 102", "correct": true},
+      {"code": "C", "text": "S/ 105", "correct": false},
+      {"code": "D", "text": "S/ 120", "correct": false},
+      {"code": "E", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q05",
+    "order": 5,
+    "module_number": 3,
+    "module_name": "Crédito y deuda",
+    "competency": "Interés compuesto en endeudamiento",
+    "text": "José adquiere un préstamo de S/ 1,000 con una tasa de interés del 20% anual compuesto. Si no realiza ningún amortizo ni pago de cuota, ¿en cuánto tiempo se duplicará la deuda total que mantiene con la entidad financiera?",
+    "source": "P-Fin 8 - Q5 (Borrowing / GFLEC)",
+    "dkt_skill_id": 9,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "En menos de 5 años", "correct": true},
+      {"code": "B", "text": "Entre 5 y 10 años", "correct": false},
+      {"code": "C", "text": "En más de 10 años", "correct": false},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q06",
+    "order": 6,
+    "module_number": 3,
+    "module_name": "Crédito y deuda",
+    "competency": "Compra de deuda y costo total",
+    "text": "Una persona mantiene una deuda pendiente de S/ 7,400 al 15% anual y paga una cuota mensual de S/ 150. Otra entidad financiera le ofrece comprar su deuda y otorgarle un nuevo crédito por S/ 10,000 al 13% anual manteniendo la misma cuota de S/ 150 al mes. ¿Cuál es la principal desventaja financiera de aceptar esta nueva oferta?",
+    "source": "PISA 2012 - PF025Q02 (Nueva oferta)",
+    "dkt_skill_id": 12,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "La tasa de interés del 13% es más elevada que la tasa original del 15%", "correct": false},
+      {"code": "B", "text": "Aumentará el capital total adeudado y terminará pagando más intereses totales a lo largo del tiempo", "correct": true},
+      {"code": "C", "text": "El monto de la cuota mensual de S/ 150 se duplicará de inmediato", "correct": false},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q07",
+    "order": 7,
+    "module_number": 4,
+    "module_name": "Pensiones",
+    "competency": "Horizonte temporal y riesgo previsional",
+    "text": "En el sistema de pensiones (como las AFP), existen distintos tipos de fondo según su nivel de riesgo y horizonte temporal. ¿Cuál de las siguientes decisiones de inversión previsional resulta INAPROPIADA según el ciclo de vida del afiliado?",
+    "source": "Adaptación de P-Fin 8 - Q8 / OCDE-INFE - QF8-QF9",
+    "dkt_skill_id": 18,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Un joven de 22 años que recién ingresa al mercado laboral y elige un fondo de mayor renta variable para maximizar su rentabilidad a largo plazo", "correct": false},
+      {"code": "B", "text": "Una persona de 45 años que mantiene un fondo balanceado de riesgo moderado", "correct": false},
+      {"code": "C", "text": "Un afiliado próximo a jubilarse (64 años) que traslada todos sus ahorros acumulados a un fondo de altísimo riesgo y volatilidad bursátil", "correct": true},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q08",
+    "order": 8,
+    "module_number": 5,
+    "module_name": "Inversión",
+    "competency": "Diversificación de portafolio",
+    "text": "Respecto a las alternativas de inversión en el mercado, ¿cuál de las siguientes afirmaciones es correcta?",
+    "source": "P-Fin 8 - Q4 (Investing) / OCDE-INFE - QK7_3",
+    "dkt_skill_id": 21,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Invertir todo el dinero en acciones de una sola empresa suele ser más seguro que invertir en un fondo mutuo diversificado en múltiples sectores e industrias", "correct": false},
+      {"code": "B", "text": "Invertir en un fondo mutuo diversificado en múltiples sectores e industrias suele ser más seguro que invertir en las acciones de una sola empresa", "correct": true},
+      {"code": "C", "text": "Ambas alternativas presentan exactamente el mismo nivel de riesgo", "correct": false},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q09",
+    "order": 9,
+    "module_number": 5,
+    "module_name": "Inversión",
+    "competency": "Principio fundamental de riesgo y retorno",
+    "text": "Si una alternativa o producto financiero ofrece una tasa de rentabilidad o ganancia inusualmente alta, es muy probable que también conlleve un alto riesgo de perder el dinero invertido.",
+    "source": "OCDE-INFE - QK7_1 (Batería SBS/CAF)",
+    "dkt_skill_id": 20,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Verdadero", "correct": true},
+      {"code": "B", "text": "Falso", "correct": false},
+      {"code": "C", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q10",
+    "order": 10,
+    "module_number": 6,
+    "module_name": "Seguros",
+    "competency": "Prioridad actuarial en jóvenes",
+    "text": "Camila es una joven trabajadora soltera de 24 años, con buena salud y sin personas a su cargo (sin dependientes). ¿Qué tipo de cobertura de seguro es más prioritaria para ella a corto plazo para proteger su estabilidad financiera?",
+    "source": "P-Fin 8 - Q6 (Insuring / GFLEC)",
+    "dkt_skill_id": 24,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Un seguro de vida tradicional", "correct": false},
+      {"code": "B", "text": "Un seguro de incapacidad laboral o invalidez temporal que proteja la continuidad de sus ingresos ante un accidente o enfermedad", "correct": true},
+      {"code": "C", "text": "Un seguro de cuidados de dependencia para la tercera edad", "correct": false},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q11",
+    "order": 11,
+    "module_number": 6,
+    "module_name": "Seguros",
+    "competency": "Determinación de la prima por riesgo",
+    "text": "Mateo contrató un seguro para su vehículo el año pasado. Al momento de renovar su póliza este año, la aseguradora evalúa los cambios ocurridos. ¿Cuál de las siguientes acciones provocará de manera directa un incremento en el costo de la prima (precio a pagar) del seguro?",
+    "source": "PISA 2012 - PF002Q01 (Seguro de motocicleta)",
+    "dkt_skill_id": 25,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Mateo cambió el color de la pintura de su vehículo", "correct": false},
+      {"code": "B", "text": "Mateo provocó dos accidentes de tránsito durante el año anterior", "correct": true},
+      {"code": "C", "text": "Mateo cambió la aseguradora a su nombre manteniendo su récord de conductor limpio", "correct": false},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  },
+  {
+    "code": "PRE_Q12",
+    "order": 12,
+    "module_number": 7,
+    "module_name": "Sistema financiero y seguridad",
+    "competency": "Ciberseguridad bancaria",
+    "text": "David recibe un correo electrónico que aparenta provenir de su entidad bancaria, indicando que hubo un fallo en el servidor y solicitándole que ingrese con urgencia a un enlace web adjunto para confirmar su usuario y clave secreta antes de bloquear su cuenta. ¿Qué acción DEBE tomar David ante este mensaje?",
+    "source": "PISA 2012 - PF053Q01 (Fallo bancario)",
+    "dkt_skill_id": 30,
+    "difficulty": 2,
+    "options": [
+      {"code": "A", "text": "Responder inmediatamente al correo adjuntando sus credenciales para evitar el bloqueo", "correct": false},
+      {"code": "B", "text": "Abrir el enlace adjunto solo si la dirección web se parece al nombre del banco", "correct": false},
+      {"code": "C", "text": "No hacer clic en el enlace, desestimar el correo y comunicarse directamente con el banco por sus canales oficiales verificados", "correct": true},
+      {"code": "D", "text": "No lo sé", "correct": false}
+    ]
+  }
+]
