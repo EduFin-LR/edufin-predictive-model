@@ -1,0 +1,15 @@
+# virtualenv
+.venv/
+__pycache__/
+*.pyc
+
+# datasets generados
+datasets/*.csv
+
+# checkpoints
+checkpoints/*.pth
+checkpoints/*.pt
+
+# figuras generadas
+figures/*
+!figures/.gitkeep
