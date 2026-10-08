@@ -3,12 +3,23 @@
 __pycache__/
 *.pyc
 
+# variables de entorno / secretos
+.env
+.env.*
+!.env.example
+
 # datasets generados
 datasets/*.csv
 
-# checkpoints
-checkpoints/*.pth
-checkpoints/*.pt
+# checkpoints y metadata generados
+checkpoints/**/*.pth
+checkpoints/**/*.pt
+checkpoints/candidates/*.json
+checkpoints/approved/*.json
+
+# conservar estructura de carpetas en Git
+!checkpoints/candidates/.gitkeep
+!checkpoints/approved/.gitkeep
 
 # figuras generadas
 figures/*
