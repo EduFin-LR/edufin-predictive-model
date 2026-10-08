@@ -17,6 +17,10 @@ checkpoints/**/*.pt
 checkpoints/candidates/*.json
 checkpoints/approved/*.json
 
+# archivos temporales de fine-tuning
+checkpoints/**/_fine_tune_tmp/
+checkpoints/**/*.csv
+
 # conservar estructura de carpetas en Git
 !checkpoints/candidates/.gitkeep
 !checkpoints/approved/.gitkeep
