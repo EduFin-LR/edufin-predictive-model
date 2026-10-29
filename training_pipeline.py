@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import os
+
 import json
 import subprocess
 import sys
 from pathlib import Path
 from typing import Sequence
+
+from publish_model import create_s3_client
 
 ROOT = Path(__file__).resolve().parent
 
@@ -36,6 +40,42 @@ def require_script(path: Path) -> None:
     if not path.exists():
         raise FileNotFoundError(f"No existe el archivo requerido: {path.name}")
 
+def ensure_base_checkpoint() -> None:
+    checkpoint = ROOT / "checkpoints" / "dkt_forget_pretrained_v1.pth"
+
+    remote_key = "checkpoints/dkt_forget_pretrained_v1.pth"
+
+    if checkpoint.is_file():
+        print(f"Checkpoint base disponible: {checkpoint}")
+        return
+
+    print("Checkpoint base no encontrado localmente.")
+    print(f"Descargando desde S3: {remote_key}")
+
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+
+    client = create_s3_client()
+    bucket = os.environ["S3_BUCKET"]
+
+    temporary = checkpoint.with_suffix(".pth.tmp")
+
+    try:
+        client.download_file(
+            bucket,
+            remote_key,
+            str(temporary)
+        )
+
+        if temporary.stat().st_size == 0:
+            raise RuntimeError("El checkpoint descargado está vacío.")
+
+        temporary.replace(checkpoint)
+
+        print(f"Checkpoint descargado: {checkpoint}")
+
+    finally:
+        temporary.unlink(missing_ok=True)
+
 
 def mtime(path: Path):
     return path.stat().st_mtime if path.exists() else None
@@ -59,6 +99,8 @@ def main() -> None:
     python = sys.executable
 
     run_step("1/4 - Exportar interacciones reales", [python, str(EXPORT_SCRIPT)])
+
+    ensure_base_checkpoint()
 
     candidate_before = mtime(CANDIDATE_METADATA)
 
