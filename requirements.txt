@@ -4,3 +4,4 @@ scikit-learn>=1.4
 torch>=2.2
 psycopg[binary]>=3.2
 boto3>=1.35
+
